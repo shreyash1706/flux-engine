@@ -10,7 +10,7 @@ class OrderList:
         self.head = None 
         self.tail = None 
         self.length = 0 
-        self.volume = 1 #total quantity at this price point 
+        self.volume = 0 #total quantity at this price point 
 
     def append_order(self, order: Order):
         '''
@@ -37,5 +37,34 @@ class OrderList:
         update volume and length 
         '''
 
+        #case1: only order in the list 
+        if self.length == 1:
+            self.head = None 
+            self.tail = None 
 
+        #case2: order at front 
+        elif order == self.head : 
+            self.head = order.next_order
+            order.next_order = None
+            self.head.prev_order = None 
+
+        #case3: order at back 
+        elif order == self.tail: 
+            self.tail = order.prev_order
+            order.prev_order = None
+            self.tail.next_order = None 
+
+        #case4: order in middle 
+        else:
+            order.prev_order.next_order = order.next_order
+            order.next_order.prev_order = order.prev_order
+            order.next_order = order.prev_order = None 
+
+        self.length -= 1 
+        self.volume -= order.quantity
+            
         
+
+
+
+
