@@ -9,7 +9,7 @@ class Side(Enum):
     BUY = 1
     SELL = 2
 
-class order:
+class Order:
     def __init__(self, order_id: str, side: Side, price: float, quantity: int):
         self.order_id = order_id 
         self.side = side
