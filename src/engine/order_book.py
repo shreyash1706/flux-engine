@@ -67,7 +67,10 @@ class OrderBook:
                 trade_volume = min(target_order.quantity, order.quantity)    
                 order.quantity -= trade_volume
                 target_order.quantity -= trade_volume
-
+                self.asks[self.best_ask].volume -= trade_volume
+                
+                # Inside your while loop, right after calculating trade_volume:
+                print(f"[TRADE EXECUTION] Order {order.order_id} matched with {target_order.order_id} | Qty: {trade_volume} @ ${self.best_ask}")
 
                 if target_order.quantity <= 0 :
                     del self.active_orders[target_order.order_id]
@@ -88,6 +91,10 @@ class OrderBook:
                 trade_volume = min(target_order.quantity, order.quantity)    
                 order.quantity -= trade_volume
                 target_order.quantity -= trade_volume
+                self.bids[self.best_bid].volume -= trade_volume
+
+                # Inside your while loop, right after calculating trade_volume:
+                print(f"[TRADE EXECUTION] Order {order.order_id} matched with {target_order.order_id} | Qty: {trade_volume} @ ${self.best_bid}")
 
 
                 if target_order.quantity <= 0:
@@ -102,5 +109,47 @@ class OrderBook:
                             self.best_bid = None
 
         if order.quantity > 0 :
-            self._add_order_to_book(order)
+            if order.price == float('inf') or order.price == float('-inf'):
+                print("Market Order Killed")
+            else:
+                self._add_order_to_book(order)
+
+
+def cancel_order(self, order_id: str):
+    '''
+    Manual cancellation endpoint.
+    removes resting orders directly without trading.
+    '''
+    if order_id not in self.active_orders:
+        return 
+
+    order_to_cancel = self.active_orders[order_id]
+    price = order_to_cancel.price
+
+    if order_to_cancel.side == Side.BUY:
+
+        self.bids[price].remove_order(order_to_cancel)
+        del self.active_orders[order_id]
+
+        if self.bids[price].length == 0 :
+            del self.bids[price]
+            if self.bids:
+                self.best_bid = max(self.bids)
+            else:
+                self.best_bid = None
+
+
+    else:
+
+        self.asks[price].remove_order(order_to_cancel)
+        del self.active_orders[order_id]
+
+        if self.asks[price].length == 0 :
+            del self.asks[price]
+            if self.asks:
+                self.best_ask = min(self.asks)
+            else:
+                self.best_ask = None
+
+
 
