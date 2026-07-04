@@ -70,7 +70,7 @@ class OrderBook:
                 self.asks[self.best_ask].volume -= trade_volume
                 
                 # Inside your while loop, right after calculating trade_volume:
-                print(f"[TRADE EXECUTION] Order {order.order_id} matched with {target_order.order_id} | Qty: {trade_volume} @ ${self.best_ask}")
+#                print(f"[TRADE EXECUTION] Order {order.order_id} matched with {target_order.order_id} | Qty: {trade_volume} @ ${self.best_ask}")
 
                 if target_order.quantity <= 0 :
                     del self.active_orders[target_order.order_id]
@@ -94,7 +94,7 @@ class OrderBook:
                 self.bids[self.best_bid].volume -= trade_volume
 
                 # Inside your while loop, right after calculating trade_volume:
-                print(f"[TRADE EXECUTION] Order {order.order_id} matched with {target_order.order_id} | Qty: {trade_volume} @ ${self.best_bid}")
+#                print(f"[TRADE EXECUTION] Order {order.order_id} matched with {target_order.order_id} | Qty: {trade_volume} @ ${self.best_bid}")
 
 
                 if target_order.quantity <= 0:
