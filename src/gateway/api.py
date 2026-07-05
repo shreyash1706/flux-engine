@@ -26,6 +26,13 @@ async def shutdown_event():
     if producer:
         producer.flush()
 
+def delivery_report(err, msg):
+    """ Called once for each message produced to indicate delivery result. """
+    if err is not None:
+        print(f"[ERROR] Message delivery failed: {err}")
+    else:
+        print(f"[SUCCESS] Order delivered to {msg.topic()} [{msg.partition()}]")
+
 @app.post("/order")
 async def place_order(order: OrderRequest):
     """
@@ -39,7 +46,7 @@ async def place_order(order: OrderRequest):
             "quantity": order.quantity
             }
     json_payload = json.dumps(order_dict).encode('utf-8')
-    producer.produce('order-ingress', value=json_payload)
+    producer.produce('order-ingress', value=json_payload, callback=delivery_report)
     producer.poll(0)
 
     return {"status": "Accepted", "order_id": order_id}
