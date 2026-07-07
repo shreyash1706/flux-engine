@@ -1,4 +1,6 @@
-from fastapi import FastAPI, HTTPException 
+from fastapi import FastAPI, HTTPException,WebSocket, WebSocketDisconnect 
+import redis.asyncio as aioredis
+import asyncio
 from pydantic import BaseModel 
 from confluent_kafka import Producer
 import json 
@@ -51,6 +53,33 @@ async def place_order(order: OrderRequest):
 
     return {"status": "Accepted", "order_id": order_id}
 
-    
+@app.websocket("/stream")
+async def websocket_endpoint(websocket: WebSocket):
+    #accept connection from user's browser
+    await websocket.accept()
+
+    redis_client = await aioredis.Redis(host='localhost', port = 6379, db=0)
+
+    pubsub = redis_client.pubsub()
+
+    pubsub.subscribe("market_updates")
+
+    try: 
+        while True:
+            #wait for msg from redis 
+            message = await pubsub.get_message(ignore_subscribe_message=True, timeout = 1.0)
+            if message is not None:
+                #extract data
+                raw_data = message['data'].decode('utf-8')
+
+                await websocket.send_text(raw_data)
+
+            await asyncio.sleep(0.01)
+
+    except WebSocketDisconnect:
+        print("Client disconnected from stream")
+    finally:
+        await pubsub.unsubscribe('market_updates')
+        await redis_client.close()
 
 
