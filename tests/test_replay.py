@@ -81,17 +81,11 @@ def test_load_10k():
     assert total_orders == len(book.active_orders)
 
 
+    print(f"Best Buy price, {book.best_bid}")
+    print(f"Best Ask price, {book.best_ask}")
 
-
-
-    
-    
-        
-
-    
-
-        
-            
+if __name__ == "__main__":
+    test_load_10k()
 
 
 
